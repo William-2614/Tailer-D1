@@ -1,0 +1,171 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id            String    @id @default(cuid())
+  email         String    @unique
+  username      String    @unique
+  passwordHash  String
+  name          String?
+  bio           String?
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  // Creator settings
+  isCreator     Boolean   @default(false)
+  subscriptionPrice Decimal? @db.Decimal(10, 2)
+  
+  // Relationships
+  bets          Bet[]
+  subscribers   Subscription[] @relation("CreatorSubscriptions")
+  subscriptions Subscription[] @relation("UserSubscriptions")
+  statistics    UserStatistics?
+}
+
+model Bet {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id])
+  
+  // Bet details
+  title         String
+  description   String?
+  amount        Decimal   @db.Decimal(10, 2)
+  odds          Decimal   @db.Decimal(10, 2)
+  sport         String
+  eventName     String
+  eventDate     DateTime
+  
+  // Immutability - once created, cannot be edited
+  createdAt     DateTime  @default(now())
+  submittedAt   DateTime  @default(now())
+  
+  // Verification
+  isVerified    Boolean   @default(false)
+  verifiedAt    DateTime?
+  aiVerificationData Json?
+  
+  // Results
+  status        BetStatus @default(PENDING)
+  result        BetResult?
+  resultDate    DateTime?
+  payout        Decimal?  @db.Decimal(10, 2)
+  
+  // Visibility
+  isPublic      Boolean   @default(true)
+  
+  @@index([userId])
+  @@index([status])
+  @@index([eventDate])
+}
+
+model UserStatistics {
+  id            String    @id @default(cuid())
+  userId        String    @unique
+  user          User      @relation(fields: [userId], references: [id])
+  
+  // Win/Loss stats
+  totalBets     Int       @default(0)
+  wonBets       Int       @default(0)
+  lostBets      Int       @default(0)
+  pushBets      Int       @default(0)
+  pendingBets   Int       @default(0)
+  
+  // Financial stats
+  totalWagered  Decimal   @default(0) @db.Decimal(10, 2)
+  totalProfit   Decimal   @default(0) @db.Decimal(10, 2)
+  roi           Decimal   @default(0) @db.Decimal(10, 4)
+  
+  // Streaks
+  currentWinStreak    Int @default(0)
+  currentLossStreak   Int @default(0)
+  longestWinStreak    Int @default(0)
+  longestLossStreak   Int @default(0)
+  
+  // Performance
+  winPercentage Decimal   @default(0) @db.Decimal(5, 2)
+  
+  updatedAt     DateTime  @updatedAt
+}
+
+model Subscription {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation("UserSubscriptions", fields: [userId], references: [id])
+  creatorId     String
+  creator       User      @relation("CreatorSubscriptions", fields: [creatorId], references: [id])
+  
+  // Stripe integration
+  stripeSubscriptionId String? @unique
+  stripePriceId String?
+  stripeCustomerId String?
+  
+  // Subscription details
+  status        SubscriptionStatus @default(ACTIVE)
+  price         Decimal   @db.Decimal(10, 2)
+  
+  startDate     DateTime  @default(now())
+  endDate       DateTime?
+  canceledAt    DateTime?
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+  
+  @@unique([userId, creatorId])
+  @@index([creatorId])
+  @@index([userId])
+}
+
+model Payment {
+  id            String    @id @default(cuid())
+  
+  // Stripe details
+  stripePaymentIntentId String @unique
+  stripeCustomerId String
+  
+  // Payment info
+  amount        Decimal   @db.Decimal(10, 2)
+  platformFee   Decimal   @db.Decimal(10, 2)
+  creatorAmount Decimal   @db.Decimal(10, 2)
+  
+  status        PaymentStatus @default(PENDING)
+  
+  createdAt     DateTime  @default(now())
+  updatedAt     DateTime  @updatedAt
+}
+
+enum BetStatus {
+  PENDING
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+}
+
+enum BetResult {
+  WON
+  LOST
+  PUSH
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  CANCELLED
+  EXPIRED
+  PAST_DUE
+}
+
+enum PaymentStatus {
+  PENDING
+  SUCCEEDED
+  FAILED
+  REFUNDED
+}
