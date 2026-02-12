@@ -1,0 +1,48 @@
+{
+  "name": "tailer-d1",
+  "version": "1.0.0",
+  "description": "Draft one of my Betting Website",
+  "main": "index.js",
+  "scripts": {
+    "dev": "next dev",
+    "build": "prisma generate && next build",
+    "start": "next start",
+    "lint": "next lint",
+    "prisma:generate": "prisma generate",
+    "prisma:push": "prisma db push",
+    "prisma:studio": "prisma studio"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/William-2614/Tailer-D1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "commonjs",
+  "bugs": {
+    "url": "https://github.com/William-2614/Tailer-D1/issues"
+  },
+  "homepage": "https://github.com/William-2614/Tailer-D1#readme",
+  "dependencies": {
+    "@prisma/client": "^7.4.0",
+    "@stripe/stripe-js": "^8.7.0",
+    "@types/node": "^25.2.3",
+    "@types/react": "^19.2.14",
+    "bcryptjs": "^3.0.3",
+    "next": "^16.1.6",
+    "next-auth": "^4.24.13",
+    "prisma": "^7.4.0",
+    "react": "^19.2.4",
+    "react-dom": "^19.2.4",
+    "stripe": "^20.3.1",
+    "typescript": "^5.9.3",
+    "zod": "^4.3.6"
+  },
+  "devDependencies": {
+    "@types/bcryptjs": "^2.4.6",
+    "autoprefixer": "^10.4.24",
+    "postcss": "^8.5.6",
+    "tailwindcss": "^4.1.18"
+  }
+}
