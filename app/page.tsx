@@ -1,3 +1,5 @@
+import Link from 'next/link'
+
 export default function Home() {
   return (
     <main className="container mx-auto px-4 py-8">
@@ -90,9 +92,12 @@ export default function Home() {
         <p className="text-xl text-gray-600 dark:text-gray-300 mb-6">
           Join Tailer today and build your transparent betting record
         </p>
-        <button className="bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold">
+        <Link
+          href="/signup"
+          className="inline-block bg-blue-500 hover:bg-blue-600 text-white px-8 py-3 rounded-lg text-lg font-semibold"
+        >
           Get Started
-        </button>
+        </Link>
       </section>
     </main>
   )
